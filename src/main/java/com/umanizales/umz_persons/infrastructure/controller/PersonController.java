@@ -3,6 +3,8 @@ package com.umanizales.umz_persons.infrastructure.controller;
 import com.umanizales.umz_persons.application.dto.ErrorDTO;
 import com.umanizales.umz_persons.application.dto.PersonDTO;
 import com.umanizales.umz_persons.application.dto.ResponseDTO;
+import com.umanizales.umz_persons.utils.Constanst;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -17,6 +19,9 @@ import java.util.List;
 @Validated
 public class PersonController {
 
+    //@Value: capturar variables del application.properties
+    @Value("${data.notFound}")
+    private String messageDataNoFound;
 
     /*metodo de API Rest que responde en la URL localhost con un texto Hola campeones
     se manda por GET*/
@@ -30,23 +35,23 @@ public class PersonController {
     @GetMapping("/dto")
     public PersonDTO PersonDTO()
     {
-        return new PersonDTO("Marcela Trujillo", "1053811156", (byte)43 );
+        return new PersonDTO("Marcela Trujillo", "1053811156", (byte)43, "marces0410@hotmail.com");
     }
 
     @GetMapping("/list")
     public ResponseEntity<ResponseDTO> listPersons(){
         List<PersonDTO> listPersonDTO = new ArrayList<>();
-        listPersonDTO.add(new PersonDTO("Zharick", "10000000",(byte)21) );
-        listPersonDTO.add(new PersonDTO("zafiro", "10000000",(byte)21) );
-        listPersonDTO.add(new PersonDTO("ada", "10000000",(byte)21) );
-        listPersonDTO.add(new PersonDTO("hongo", "10000000",(byte)21) );
+        //listPersonDTO.add(new PersonDTO("Zharick", "10000000",(byte)21));
+        //listPersonDTO.add(new PersonDTO("zafiro", "10000000",(byte)21));
+        //listPersonDTO.add(new PersonDTO("ada", "10000000",(byte)21));
+        //listPersonDTO.add(new PersonDTO("hongo", "10000000",(byte)21));
 
         if(listPersonDTO.size()>0)
             return new ResponseEntity<>
-                    (new ResponseDTO("success",listPersonDTO,null), HttpStatus.OK);
+                    (new ResponseDTO(Constanst.SUCCESS,listPersonDTO,null), HttpStatus.OK);
         else {
             List<ErrorDTO> errorDTOS = new ArrayList<>();
-            errorDTOS.add(new ErrorDTO(HttpStatus.NOT_FOUND.value(),"La consulta no generó resultado"));
+            errorDTOS.add(new ErrorDTO(HttpStatus.NOT_FOUND.value(),messageDataNoFound));
             return new ResponseEntity<>
                     (new ResponseDTO("error", null, errorDTOS), HttpStatus.OK);
         }
@@ -64,6 +69,7 @@ public class PersonController {
     @PostMapping
     //@Requestbody para indicar que va a recibir un body
     public PersonDTO savePerson(@Valid @RequestBody PersonDTO personDTO){
+        System.out.println(("personDTO = ") + personDTO);
         personDTO.setName("Bienvenid@ " + personDTO.getName());
         return personDTO;
     }
